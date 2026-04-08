@@ -131,30 +131,45 @@ def predict_collaborative(artist_name, top_n=5):
         os.path.join(COLLAB_PATH, "matrix.pkl")
     )
 
+    # ensure dataframe
+    if not hasattr(matrix, "columns"):
+        return ["Matrix format error"]
+
     artists = list(matrix.columns)
 
     artist_name = artist_name.lower().strip()
 
     artists_lower = [
-        a.lower().strip() for a in artists
+        str(a).lower().strip()
+        for a in artists
     ]
 
     if artist_name not in artists_lower:
-
         return ["Artist not found"]
 
-
-    index = artists_lower.index(
-        artist_name
-    )
+    index = artists_lower.index(artist_name)
 
 
-    # USER USER or ITEM ITEM
+    # convert matrix safely
+    matrix_values = np.array(matrix)
+
+    # handle NaN
+    matrix_values = np.nan_to_num(matrix_values)
+
+
+    # USER-USER or ITEM-ITEM
     if model_name in ["user_user", "item_item"]:
 
         similarity = joblib.load(
             os.path.join(COLLAB_PATH, "similarity.pkl")
         )
+
+        similarity = np.nan_to_num(
+            np.array(similarity)
+        )
+
+        if index >= similarity.shape[0]:
+            return ["Not enough data for this artist"]
 
         scores = list(
             enumerate(similarity[index])
@@ -164,12 +179,17 @@ def predict_collaborative(artist_name, top_n=5):
     # SVD MODEL
     elif model_name == "svd":
 
-        latent_matrix = matrix.values
+        if index >= matrix_values.shape[0]:
+            return ["Not enough data for this artist"]
 
-        target_vector = latent_matrix[index]
+        target_vector = matrix_values[index]
+
+        # if vector all zeros
+        if np.all(target_vector == 0):
+            return ["Not enough data for this artist"]
 
         similarities = np.dot(
-            latent_matrix,
+            matrix_values,
             target_vector
         )
 
@@ -178,11 +198,26 @@ def predict_collaborative(artist_name, top_n=5):
         )
 
 
+    # sort safely
     scores = sorted(
         scores,
         key=lambda x: x[1],
         reverse=True
-    )[1:top_n+1]
+    )
+
+
+    # remove same artist
+    scores = [
+        s for s in scores
+        if s[0] != index
+    ]
+
+
+    if len(scores) == 0:
+        return ["No recommendations available"]
+
+
+    scores = scores[:top_n]
 
 
     recommendations = [
