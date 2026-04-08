@@ -1,0 +1,14 @@
+artifact_uri: file:c:/Users/god/Desktop/music_recomendations_system/notebooks/mlruns/277328906693477146/5bfd01cfbf0d43aaaaaa848bf0a5d252/artifacts
+end_time: 1775638789863
+entry_point_name: ''
+experiment_id: '277328906693477146'
+lifecycle_stage: active
+run_id: 5bfd01cfbf0d43aaaaaa848bf0a5d252
+run_name: collab_user_user
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775638789461
+status: 3
+tags: []
+user_id: god
