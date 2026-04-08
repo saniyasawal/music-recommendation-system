@@ -1,0 +1,5 @@
+outs:
+- md5: 7b2e5e9c8c6141aa68e2204946dd22f0
+  size: 2800820
+  hash: md5
+  path: content_based_data.csv

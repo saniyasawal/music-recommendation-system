@@ -1,0 +1,5 @@
+outs:
+- md5: 8b14e647b8a77c10d1fdb7953c0256e2
+  size: 12315717
+  hash: md5
+  path: collaborative_filtering_data.csv
